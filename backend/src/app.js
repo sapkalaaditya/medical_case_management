@@ -39,9 +39,13 @@ app.get('/api/health', (req, res) => {
 
 // API Route modules
 const authRoutes = require('./routes/authRoutes');
+const caseRoutes = require('./routes/caseRoutes');
+const dashboardRoutes = require('./routes/dashboardRoutes');
 
 // Mount routes
 app.use('/api', authRoutes);
+app.use('/api/cases', caseRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
 // 404 Handler for undefined routes
 app.use(notFoundHandler);
