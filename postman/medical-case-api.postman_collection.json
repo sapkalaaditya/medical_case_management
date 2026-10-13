@@ -1,0 +1,337 @@
+{
+  "info": {
+    "_postman_id": "b3e04543-95e2-452a-9f5b-6c4a8cf6a9e1",
+    "name": "Medical Case Management API",
+    "description": "Complete Postman collection for Medical Case Management System (MERN Stack). Includes JWT auth with token revocation, Case CRUD with policies, Dashboard stats, and Public Holiday integration.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "caseId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "1. Login (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.success && responseJson.data && responseJson.data.token) {",
+                  "    pm.collectionVariables.set('token', responseJson.data.token);",
+                  "    console.log('JWT Token stored successfully');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@medical.local\",\n  \"password\": \"AdminPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            },
+            "description": "Authenticate user, issue JWT with unique jti stored in ApiToken collection, and automatically save token in collection variable."
+          }
+        },
+        {
+          "name": "2. Login (Viewer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"viewer@medical.local\",\n  \"password\": \"ViewerPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          }
+        },
+        {
+          "name": "3. Login (Engineer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"engineer@medical.local\",\n  \"password\": \"EngineerPassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["login"]
+            }
+          }
+        },
+        {
+          "name": "4. Get Current User (/me)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["me"]
+            }
+          }
+        },
+        {
+          "name": "5. Logout (Revoke Token)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["logout"]
+            },
+            "description": "Deletes the token's jti record from ApiToken, immediately revoking the session."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/dashboard/stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["dashboard", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cases",
+      "item": [
+        {
+          "name": "List Cases (Paginated & Filtered)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.success && responseJson.data.items && responseJson.data.items.length > 0) {",
+                  "    pm.collectionVariables.set('caseId', responseJson.data.items[0]._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cases?page=1&limit=10&search=&status=&priority=&sortBy=createdAt&order=desc",
+              "host": ["{{baseUrl}}"],
+              "path": ["cases"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" },
+                { "key": "search", "value": "" },
+                { "key": "status", "value": "" },
+                { "key": "priority", "value": "" },
+                { "key": "sortBy", "value": "createdAt" },
+                { "key": "order", "value": "desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Case",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const responseJson = pm.response.json();",
+                  "if (responseJson.success && responseJson.data && responseJson.data._id) {",
+                  "    pm.collectionVariables.set('caseId', responseJson.data._id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"caseNumber\": \"CASE-9001\",\n  \"patientReference\": \"PT-9001\",\n  \"surgeonName\": \"Dr. Stephen Strange\",\n  \"implantType\": \"Custom Cranial Reconstruction Plate\",\n  \"status\": \"Planning\",\n  \"priority\": \"High\",\n  \"surgeryDate\": \"2026-12-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cases",
+              "host": ["{{baseUrl}}"],
+              "path": ["cases"]
+            }
+          }
+        },
+        {
+          "name": "Get Case By ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cases/{{caseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cases", "{{caseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Case",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"caseNumber\": \"CASE-9001\",\n  \"patientReference\": \"PT-9001\",\n  \"surgeonName\": \"Dr. Stephen Strange\",\n  \"implantType\": \"Custom Cranial Reconstruction Plate\",\n  \"status\": \"Approved\",\n  \"priority\": \"High\",\n  \"surgeryDate\": \"2026-12-20\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/cases/{{caseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cases", "{{caseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Case (Admin Only)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/cases/{{caseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["cases", "{{caseId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Bonus Utilities",
+      "item": [
+        {
+          "name": "Check Public Holidays (Nager.Date)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/holidays?date=2026-08-15&country=IN",
+              "host": ["{{baseUrl}}"],
+              "path": ["holidays"],
+              "query": [
+                { "key": "date", "value": "2026-08-15" },
+                { "key": "country", "value": "IN" }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
