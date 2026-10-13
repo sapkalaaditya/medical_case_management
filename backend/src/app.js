@@ -41,11 +41,13 @@ app.get('/api/health', (req, res) => {
 const authRoutes = require('./routes/authRoutes');
 const caseRoutes = require('./routes/caseRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
+const holidayRoutes = require('./routes/holidayRoutes');
 
 // Mount routes
 app.use('/api', authRoutes);
 app.use('/api/cases', caseRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/holidays', holidayRoutes);
 
 // 404 Handler for undefined routes
 app.use(notFoundHandler);
