@@ -37,11 +37,11 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
-// Route registration placeholder (routes will be mounted in upcoming phases)
-// Routes:
-// app.use('/api', authRoutes);
-// app.use('/api/cases', caseRoutes);
-// app.use('/api/dashboard', dashboardRoutes);
+// API Route modules
+const authRoutes = require('./routes/authRoutes');
+
+// Mount routes
+app.use('/api', authRoutes);
 
 // 404 Handler for undefined routes
 app.use(notFoundHandler);
